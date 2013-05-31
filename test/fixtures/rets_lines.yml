@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  rets_type: MyString
+  source: MyString
+
+two:
+  rets_collection_id: 1
+  rets_type: MyString
+  source: MyString

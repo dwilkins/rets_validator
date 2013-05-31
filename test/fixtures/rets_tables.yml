@@ -1,0 +1,63 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  system_name: MyString
+  standard_name: MyString
+  long_name: MyString
+  db_name: MyString
+  short_name: MyString
+  maximum_length: 1
+  data_type: MyString
+  precision: 1
+  searchable: false
+  interpretation: MyString
+  alignment: MyString
+  use_separator: false
+  edit_mask_id: MyString
+  lookup_name: MyString
+  max_select: 1
+  units: MyString
+  index: false
+  minimum: MyString
+  maximum: MyString
+  default: MyString
+  required: false
+  search_help_id: MyString
+  unique: false
+  mod_time_stamp: 2013-05-29 21:14:08
+  foreign_key_name: MyString
+  foreign_field: MyString
+  in_key_index: false
+
+two:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  system_name: MyString
+  standard_name: MyString
+  long_name: MyString
+  db_name: MyString
+  short_name: MyString
+  maximum_length: 1
+  data_type: MyString
+  precision: 1
+  searchable: false
+  interpretation: MyString
+  alignment: MyString
+  use_separator: false
+  edit_mask_id: MyString
+  lookup_name: MyString
+  max_select: 1
+  units: MyString
+  index: false
+  minimum: MyString
+  maximum: MyString
+  default: MyString
+  required: false
+  search_help_id: MyString
+  unique: false
+  mod_time_stamp: 2013-05-29 21:14:08
+  foreign_key_name: MyString
+  foreign_field: MyString
+  in_key_index: false

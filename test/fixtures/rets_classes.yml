@@ -1,0 +1,29 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  class_name: MyString
+  standard_name: MyString
+  visible_name: MyString
+  description: MyString
+  rets_table_collection_id: 1
+  update_version: MyString
+  update_date: 2013-05-29 21:14:06
+  class_time_stamp: 2013-05-29 21:14:06
+  deleted_flag_field: MyString
+  deleted_flag_value: MyString
+  has_key_index: false
+
+two:
+  rets_collection_id: 1
+  class_name: MyString
+  standard_name: MyString
+  visible_name: MyString
+  description: MyString
+  rets_table_collection_id: 1
+  update_version: MyString
+  update_date: 2013-05-29 21:14:06
+  class_time_stamp: 2013-05-29 21:14:06
+  deleted_flag_field: MyString
+  deleted_flag_value: MyString
+  has_key_index: false

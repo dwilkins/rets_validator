@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  edit_mask_id: MyString
+  value: MyString
+
+two:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  edit_mask_id: MyString
+  value: MyString

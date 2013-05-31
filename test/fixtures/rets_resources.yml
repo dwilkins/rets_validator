@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  resource_id: MyString
+  standard_name: MyString
+  visible_name: MyString
+  description: MyString
+  key_field: MyString
+  class_count: 1
+  rets_class_collection_id: 1
+  rets_object_collection_id: 1
+  search_help_version: MyString
+  search_help_date: 2013-05-29 21:14:05
+  rets_edit_mask_collection_id: 1
+  rets_lookup_collection_id: 1
+  update_help_version: MyString
+  update_help_date: 2013-05-29 21:14:05
+  validation_expression_version: MyString
+  validation_expression_date: 2013-05-29 21:14:05
+
+two:
+  rets_collection_id: 1
+  resource_id: MyString
+  standard_name: MyString
+  visible_name: MyString
+  description: MyString
+  key_field: MyString
+  class_count: 1
+  rets_class_collection_id: 1
+  rets_object_collection_id: 1
+  search_help_version: MyString
+  search_help_date: 2013-05-29 21:14:05
+  rets_edit_mask_collection_id: 1
+  rets_lookup_collection_id: 1
+  update_help_version: MyString
+  update_help_date: 2013-05-29 21:14:05
+  validation_expression_version: MyString
+  validation_expression_date: 2013-05-29 21:14:05

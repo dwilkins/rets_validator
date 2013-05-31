@@ -1,3 +1,9 @@
+PATH
+  remote: /home/dwilkins/source/ruby-rets
+  specs:
+    ruby-rets (2.0.7)
+      nokogiri (~> 1.5.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -86,8 +92,6 @@ GEM
     rake (10.0.4)
     rdoc (3.12.2)
       json (~> 1.4)
-    ruby-rets (2.0.7)
-      nokogiri (~> 1.5.0)
     sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -118,6 +122,6 @@ DEPENDENCIES
   mysql2
   pry
   rails (= 3.2.13)
-  ruby-rets
+  ruby-rets!
   sass-rails (~> 3.2.3)
   uglifier (>= 1.0.3)

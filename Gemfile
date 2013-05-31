@@ -6,7 +6,9 @@ gem 'rails', '3.2.13'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'mysql2'
-gem 'ruby-rets'
+#gem 'ruby-rets'
+gem 'ruby-rets', path: '/home/dwilkins/source/ruby-rets'
+
 
 # Gems used only for assets and not required
 # in production environments by default.

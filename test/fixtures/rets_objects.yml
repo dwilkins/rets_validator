@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  object_type: MyString
+  mime_type: MyString
+  visible_name: MyString
+  description: MyString
+
+two:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  object_type: MyString
+  mime_type: MyString
+  visible_name: MyString
+  description: MyString

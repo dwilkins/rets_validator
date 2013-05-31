@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  query_string: MyString
+  rows_returned: 1
+  username: MyString
+
+two:
+  query_string: MyString
+  rows_returned: 1
+  username: MyString

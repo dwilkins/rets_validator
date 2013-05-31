@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  collection_type: MyString
+  publication_date: 2013-05-29 21:14:03
+  version: MyString
+
+two:
+  collection_type: MyString
+  publication_date: 2013-05-29 21:14:03
+  version: MyString

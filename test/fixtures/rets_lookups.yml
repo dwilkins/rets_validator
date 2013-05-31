@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  lookup_name: MyString
+  visible_name: MyString
+  version: MyString
+  date: 2013-05-29 21:14:13
+
+two:
+  rets_collection_id: 1
+  metadata_entry_id: MyString
+  lookup_name: MyString
+  visible_name: MyString
+  version: MyString
+  date: 2013-05-29 21:14:13
