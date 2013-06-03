@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130530200809) do
+ActiveRecord::Schema.define(:version => 20130603010317) do
 
   create_table "rets_classes", :force => true do |t|
     t.integer  "rets_collection_id"
@@ -30,12 +30,16 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
     t.datetime "updated_at",                              :null => false
   end
 
+  add_index "rets_classes", ["rets_table_collection_id"], :name => "index_rets_classes_on_rets_table_collection_id"
+  add_index "rets_classes", ["standard_name"], :name => "index_rets_classes_on_standard_name"
+
   create_table "rets_collections", :force => true do |t|
     t.string   "collection_type",  :limit => 25
     t.datetime "publication_date"
     t.string   "version",          :limit => 25
     t.datetime "created_at",                     :null => false
     t.datetime "updated_at",                     :null => false
+    t.integer  "rets_server_id",                 :null => false
   end
 
   create_table "rets_edit_masks", :force => true do |t|
@@ -45,6 +49,14 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
     t.string   "value",              :limit => 250
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
+  end
+
+  create_table "rets_line_errors", :force => true do |t|
+    t.integer  "rets_line_id"
+    t.integer  "rets_table_id"
+    t.string   "error"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
   end
 
   create_table "rets_lines", :force => true do |t|
@@ -59,6 +71,8 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
     t.datetime "created_at",                             :null => false
     t.datetime "updated_at",                             :null => false
   end
+
+  add_index "rets_lines", ["rets_sysid"], :name => "index_rets_lines_on_rets_sysid", :unique => true
 
   create_table "rets_lookup_types", :force => true do |t|
     t.integer  "rets_collection_id"
@@ -96,10 +110,11 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
   create_table "rets_queries", :force => true do |t|
     t.integer  "rows_returned"
     t.integer  "error_code"
-    t.string   "error_message", :limit => 1000
-    t.string   "options",       :limit => 3000
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.string   "error_message",  :limit => 1000
+    t.string   "options",        :limit => 3000
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.integer  "rets_server_id",                 :null => false
   end
 
   create_table "rets_resources", :force => true do |t|
@@ -124,12 +139,26 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
     t.datetime "updated_at",                                   :null => false
   end
 
+  create_table "rets_servers", :force => true do |t|
+    t.string   "name"
+    t.string   "username"
+    t.string   "password"
+    t.string   "login_url"
+    t.string   "contact_info"
+    t.string   "counties"
+    t.string   "state"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "rets_table_edit_mask_links", :force => true do |t|
     t.integer  "rets_table_id",     :null => false
     t.integer  "rets_edit_mask_id", :null => false
     t.datetime "created_at",        :null => false
     t.datetime "updated_at",        :null => false
   end
+
+  add_index "rets_table_edit_mask_links", ["rets_table_id", "rets_edit_mask_id"], :name => "index_rteml_on_rets_table_id_and_rets_edit_mask_id", :unique => true
 
   create_table "rets_tables", :force => true do |t|
     t.integer  "rets_collection_id"
@@ -163,5 +192,8 @@ ActiveRecord::Schema.define(:version => 20130530200809) do
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
+
+  add_index "rets_tables", ["rets_collection_id"], :name => "index_rets_tables_on_rets_collection_id"
+  add_index "rets_tables", ["rets_lookup_id"], :name => "index_rets_tables_on_rets_lookup_id"
 
 end

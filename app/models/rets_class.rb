@@ -5,6 +5,7 @@ class RetsClass < ActiveRecord::Base
 
   belongs_to :rets_collection, conditions: {collection_type: 'RetsClass'}
   belongs_to :rets_table_collection, class_name: 'RetsCollection', conditions: { collection_type: 'RetsTable' }
-  has_many :rets_tables, through: :rets_table_collection
+
+  has_many :rets_tables, through: :rets_table_collection, inverse_of: :rets_class
 
 end

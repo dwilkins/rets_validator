@@ -3,16 +3,49 @@ require 'active_support/all'
 
 namespace :import do
   desc 'Get some RETS metadata'
-  task :rets => :environment do
+  task :metadata, [:server_in] => :environment do |tsk, args|
+    args.with_defaults(:server_in => "")
+#  task :rets => :environment do
     include ApplicationHelper
-    if ENV['RETS_USER'].nil? || ENV['RETS_USER'].empty? || ENV['RETS_PASSWORD'].nil? || ENV['RETS_PASSWORD'].empty?
-      puts "Please set the RETS_USER and RETS_PASSWORD environment variables and run again"
+    if !args[:server_in].empty?
+      server = RetsServer.find_by_name(args[:server_in])
+      if server.nil?
+        server = RetsServer.find(args[:server_in].to_i)
+      end
+    end
+
+    if args[:server_in].nil? || args[:server_in].empty? || server.nil?
+      puts "Please specify a server name like:"
+      puts "   rake import:rets[SERVERNAME]]"
+      puts "   rake import:rets[SERVERID]]"
+      servers = RetsServer.all
+      if !servers.nil? && !servers.empty?
+        servers.each do |srvr|
+          puts "    rake import:rets[#{srvr.name}]"
+          puts "    or"
+          puts "    rake import:rets[#{srvr.id}]"
+        end
+      else
+        puts " NO SERVERS DEFINED IN rets_servers in the db"
+      end
       next
     end
-    client = RETS::Client.login(:url => "http://glvar.apps.retsiq.com/rets/login", :username => ENV['RETS_USER'], :password => ENV['RETS_PASSWORD'])
-    if File.exists? 'rets.yml'
-      tables = File.open('rets.yml'){ |rets_data| YAML.load rets_data }
-    else
+    begin
+      client = RETS::Client.login(url: server.login_url,
+                                  username: server.username,
+                                  password: server.password)
+    rescue Exception => e
+      puts "Error #{e.message} connecting"
+      next
+    end
+    if !client.nil? && !client.rets_data.nil? && client.rets_data.nil[:code].to_i > 0
+      puts ((client.nil? || client.rets_data.nil?)  ? "problem connecting to #{ENV['RETS_URL']}" : client.rets_data[:text])
+      next
+    end
+    File.open( 'rets.metadata.yml', 'w' ) do |out|
+      out.write("\n")
+    end
+    begin
       resources = {}
       rets_classes = {}
       tables = {}
@@ -27,12 +60,17 @@ namespace :import do
           end
           break
         end
+        File.open( 'rets.metadata.yml', 'a' ) do |out|
+          YAML.dump({type: type, attrs: attrs, metadata: metadata},out )
+        end
+
         if type == 'RESOURCE'
           resources = {}
           resources[:version] = attrs["Version"]
           resources[:date] = attrs["Date"]
           resources[:names] = {}
-          resource_collection = RetsCollection.create(collection_type: 'RetsResource',
+          resource_collection = RetsCollection.create(rets_server_id: server.id,
+                                                      collection_type: 'RetsResource',
                                                       publication_date: attrs['Date'],
                                                       version: attrs['Version'])
           metadata.each do |m|
@@ -62,9 +100,10 @@ namespace :import do
           rets_class[:resource] = resources[:names][attrs["Resource"]]
           rets_class[:names] = {}
           this_resource = RetsResource.where(resource_id: attrs['Resource']).first
-          class_collection = RetsCollection.create(collection_type: 'RetsClass',
-                                                      publication_date: attrs['Date'],
-                                                      version: attrs['Version'])
+          class_collection = RetsCollection.create(rets_server_id: server.id,
+                                                   collection_type: 'RetsClass',
+                                                   publication_date: attrs['Date'],
+                                                   version: attrs['Version'])
           this_resource.rets_class_collection_id = class_collection.id
           this_resource.save
           metadata.each do |m|
@@ -90,7 +129,8 @@ namespace :import do
           table[:version] = attrs["Version"]
           table[:date] = attrs["Date"]
           table[:fields] = {}
-          this_collection = RetsCollection.create(collection_type: 'RetsTable',
+          this_collection = RetsCollection.create(rets_server_id: server.id,
+                                                  collection_type: 'RetsTable',
                                                   publication_date: attrs['Date'],
                                                   version: attrs['Version'])
           this_class = RetsClass.where(class_name: attrs['Class']).first
@@ -147,7 +187,8 @@ namespace :import do
           lookup[:resource] = resources[:names][attrs["Resource"]]
           lookup[:names] = {}
           this_resource = RetsResource.where(resource_id: attrs['Resource']).first
-          this_collection = RetsCollection.create(collection_type: 'RetsLookup',
+          this_collection = RetsCollection.create(rets_server_id: server.id,
+                                                  collection_type: 'RetsLookup',
                                                   publication_date: attrs['Date'],
                                                   version: attrs['Version'])
           this_resource.rets_lookup_collection_id = this_collection.id
@@ -174,11 +215,13 @@ namespace :import do
           lookup_type[:lookup_name] = attrs['Lookup']
           lookup_type[:lookup] = lookups[attrs["Resource"]][:names][attrs['Lookup']]
           lookup_type[:values] = {}
-          this_collection = RetsCollection.create(collection_type: 'RetsLookupType',
+          this_collection = RetsCollection.create(rets_server_id: server.id,
+                                                  collection_type: 'RetsLookupType',
                                                   publication_date: attrs['Date'],
                                                   version: attrs['Version'])
           this_lookup = RetsLookup.where(:lookup_name => attrs['Lookup']).first
           this_lookup.rets_lookup_type_collection_id = this_collection.id
+          this_lookup.save
           metadata.each do |m|
             lookup_type[:values][m["MetadataEntryID"]] = m
             RetsLookupType.create(rets_collection_id: this_collection.id,
@@ -197,7 +240,8 @@ namespace :import do
           edit_mask[:resource] = resources[:names][attrs["Resource"]]
           edit_mask[:fields] = {}
           this_resource = RetsResource.where(resource_id: attrs['Resource']).first
-          this_collection = RetsCollection.create(collection_type: 'RetsEditMask',
+          this_collection = RetsCollection.create(rets_server_id: server.id,
+                                                  collection_type: 'RetsEditMask',
                                                   publication_date: attrs['Date'],
                                                   version: attrs['Version'])
           this_resource.rets_edit_mask_collection_id = this_collection.id
@@ -218,14 +262,14 @@ namespace :import do
       tables.each do |t,tv|
         tv[:system_names] ||= {}
         tv[:fields].each do |f,fv|
-          if !fv["EditMaskID"].empty?
+          if !fv["EditMaskID"].nil? && !fv["EditMaskID"].empty?
             masks = fv["EditMaskID"].split(',')
             fv[:masks] = {}
             masks.each do |em|
               fv[:masks][em] =  tv[:resource][:edit_mask][:fields][em]
             end
           end
-          if !fv["LookupName"].empty?
+          if !fv["LookupName"].nil? && !fv["LookupName"].empty? && !tv[:resource][:lookup][:names].nil?
             fv[:lookup_type] = tv[:resource][:lookup][:names][fv["LookupName"]][:lookup_type]
           end
           tv[:system_names][fv["SystemName"]] = fv
@@ -238,5 +282,42 @@ namespace :import do
         YAML.dump(types, out )
       end
     end
+  end
+
+  task :rets, [:server_in, :query_in, :repeat_in, :class_in] => :environment do |tsk, args|
+    args.with_defaults(server_in: '', query_in: '',class_in: '1',repeat_in: '1')
+    #  task :rets => :environment do
+    include ApplicationHelper
+    if !args[:server_in].empty?
+      server = RetsServer.find_by_name(args[:server_in])
+      if server.nil?
+        server = RetsServer.find(args[:server_in].to_i)
+      end
+    end
+
+    if args[:server_in].nil? || args[:server_in].empty? || server.nil?
+      puts "Please specify a server name like:"
+      puts "   rake import:rets[SERVERNAME]]"
+      puts "   rake import:rets[SERVERID]]"
+      servers = RetsServer.all
+      if !servers.nil? && !servers.empty?
+        servers.each do |srvr|
+          puts "    rake import:rets[#{srvr.name}]"
+          puts "    or"
+          puts "    rake import:rets[#{srvr.id}]"
+        end
+      else
+        puts " NO SERVERS DEFINED IN rets_servers in the db"
+      end
+      next
+    end
+    if args[:query_in].empty?
+      args[:repeat_in].to_i.times do
+        RetsQuery.continue_pulling args[:server_in]
+      end
+    else
+      RetsQuery.perform_query args[:server_in], class: args[:class_in], query: args[:query_in]
+    end
+
   end
 end

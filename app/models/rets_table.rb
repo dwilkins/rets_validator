@@ -9,9 +9,13 @@ class RetsTable < ActiveRecord::Base
   attr_accessible :unique, :units, :use_separator
 
   belongs_to :rets_lookup
-  belongs_to :rets_collection, conditions: {collection_type: 'RetsTable'}
+  belongs_to :rets_collection, conditions: {collection_type: 'RetsTable'}, inverse_of: :rets_tables
 
+#  has_one  :rets_table_collection, foreign_key: rets_table_collection_id, through: :rets_table_collection, class_name: 'RetsClass'
+  has_one :rets_class, foreign_key: :rets_table_collection_id,primary_key: :rets_collection_id,  class_name: 'RetsClass', inverse_of: :rets_table_collection
   has_many :rets_table_edit_mask_links
   has_many :rets_edit_masks, through: :rets_table_edit_mask_links, inverse_of: :rets_tables
+
+  scope :for_class, lambda{|rets_class| joins(:rets_class).where(rets_classes: {class_name: rets_class } ) }
 
 end
