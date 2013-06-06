@@ -3,4 +3,6 @@ class RetsTableEditMaskLink < ActiveRecord::Base
 
   belongs_to :rets_edit_mask
   belongs_to :rets_table
+
+  has_many :rets_line_errors
 end

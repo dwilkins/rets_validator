@@ -1,7 +1,7 @@
 require 'active_record'
 require 'active_support/all'
 
-namespace :import do
+namespace :rets do
   desc 'Get some RETS metadata'
   task :metadata, [:server_in] => :environment do |tsk, args|
     args.with_defaults(:server_in => "")
@@ -284,7 +284,7 @@ namespace :import do
     end
   end
 
-  task :rets, [:server_in, :query_in, :repeat_in, :class_in] => :environment do |tsk, args|
+  task :data, [:server_in, :query_in, :repeat_in, :class_in] => :environment do |tsk, args|
     args.with_defaults(server_in: '', query_in: '',class_in: '1',repeat_in: '1')
     #  task :rets => :environment do
     include ApplicationHelper
@@ -318,6 +318,34 @@ namespace :import do
     else
       RetsQuery.perform_query args[:server_in], class: args[:class_in], query: args[:query_in]
     end
-
   end
+
+  task :validate, [:server_in] => :environment do |tsk, args|
+    args.with_defaults(server_in: '')
+    if !args[:server_in].empty?
+      server = RetsServer.find_by_name(args[:server_in])
+      if server.nil?
+        server = RetsServer.find(args[:server_in].to_i)
+      end
+    end
+
+    if args[:server_in].nil? || args[:server_in].empty? || server.nil?
+      puts "Please specify a server name like:"
+      puts "   rake import:rets[SERVERNAME]]"
+      puts "   rake import:rets[SERVERID]]"
+      servers = RetsServer.all
+      if !servers.nil? && !servers.empty?
+        servers.each do |srvr|
+          puts "    rake import:rets[#{srvr.name}]"
+          puts "    or"
+          puts "    rake import:rets[#{srvr.id}]"
+        end
+      else
+        puts " NO SERVERS DEFINED IN rets_servers in the db"
+      end
+      next
+    end
+    RetsQuery.all.each { |rq| rq.validate_query if rq.unvalidated_rets_lines.count > 0 }
+  end
+
 end

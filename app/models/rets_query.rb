@@ -1,20 +1,21 @@
-class Hash
-  def to_yaml_style
-    :inline
-  end
-end
-class Array
-  def to_yaml_style
-    :inline
-  end
-end
-
+# class Hash
+#   def to_yaml_style
+#     :inline
+#   end
+# end
+# class Array
+#   def to_yaml_style
+#     :inline
+#   end
+# end
 
 class RetsQuery < ActiveRecord::Base
   attr_accessible :rows_returned,:error_code, :error_message
   attr_accessible :options, :rets_server_id
   has_many :rets_lines, inverse_of: :rets_query
-
+  has_many :unvalidated_rets_lines, class_name: 'RetsLine', conditions: {status: -1}
+  has_many :validated_rets_lines, class_name: 'RetsLine', conditions: "status != -1"
+  has_many :rets_line_errors, through: :validated_rets_lines
 
   def self.continue_pulling server, new_options = {}
     unless server.is_a? RetsServer
@@ -74,7 +75,7 @@ class RetsQuery < ActiveRecord::Base
       query: nil,
       offset: 0,
       standard_names: false,
-      format: "COMPACT_DECODED",
+      format: "COMPACT",
       restricted: nil,
       limit: 1
     }
@@ -164,6 +165,35 @@ class RetsQuery < ActiveRecord::Base
     this_query.rows_returned = rows_returned
     this_query.save
     this_query
+  end
+
+  def unvalidated_lines
+    self.rets_lines.unvalidated.count
+  end
+
+  def validate_query
+    num_errors = 0
+    num_rows = 0
+    elapsed = 0
+    old_elapsed = 0
+    line_errors = 0
+    start_time = DateTime.now
+    self.rets_lines.unvalidated.each do |rl|
+      num_rows += 1
+      line_errors = rl.log_errors.count
+      rl.status = line_errors > 0 ? 1 : 0
+      rl.save
+      num_errors += line_errors
+      end_time = DateTime.now
+      elapsed = (end_time.to_i - start_time.to_i)
+      if ((num_rows % 500) == 0) || (elapsed > old_elapsed && ((elapsed % 15) == 0))
+        old_elapsed = elapsed
+        puts "        ... Validation detected #{num_errors} errors for #{num_rows} out of #{self.rets_lines.count} lines - elapsed time = #{(end_time.to_i - start_time.to_i)} seconds"
+      end
+    end
+    end_time = DateTime.now
+    puts "Complete... Validation detected #{self.rets_line_errors.count} errors for #{self.rets_lines.count} lines - elapsed time = #{(end_time.to_i - start_time.to_i)} seconds"
+    num_errors
   end
 
 end

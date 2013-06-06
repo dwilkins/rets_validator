@@ -18,4 +18,30 @@ class RetsTable < ActiveRecord::Base
 
   scope :for_class, lambda{|rets_class| joins(:rets_class).where(rets_classes: {class_name: rets_class } ) }
 
+
+  def decoded_value value
+
+  end
+
+  def lookup_values
+    @lookup_values ||= Hash[rets_lookup.rets_lookup_types.collect { |lt| [lt.value.strip, lt.long_value.strip] }]
+  end
+
+  def valid_values decoded = true
+    decoded ? lookup_values.values : lookup_values.keys
+  end
+
+  def valid_value? value
+    if lookup_values
+      if((value && !value.empty? && (!self.valid_values(true).include?(value) && !self.valid_values(false).include?(value))) ||
+         (value && value.empty? && self.required))
+        false
+      else
+        true
+      end
+    else
+      true
+    end
+  end
+
 end
